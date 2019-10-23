@@ -3,10 +3,13 @@ const bcrypt = require('bcrypt');
 const _ = require('underscore');
 
 const Usuario = require('../models/usuario');
+const { verificaToken, verificaAdminRole } = require('../middlewares/autentificacion');
 
 const app = express();
 
-app.get('/usuario', function(req, res) {
+app.get('/usuario', verificaToken, (req, res) => {
+
+    //console.log(req.usuario); //viene del middleware verificaToken
 
     //parametros opcionales se mandan con un ? ejem: /usuario?desde=10&limite=10
     let desde = req.query.desde || 0;
@@ -27,6 +30,14 @@ app.get('/usuario', function(req, res) {
                 });
             }
 
+            Usuario.countDocuments({ estado: true }, (err, conteo) => {
+                res.status(200).json({
+                    ok: true,
+                    usuarios,
+                    cuantos: conteo
+                });
+            });
+            /* count se va a dejar de usar se cambio por countDocuments
             Usuario.count({ estado: true }, (err, conteo) => {
                 res.status(200).json({
                     ok: true,
@@ -34,12 +45,13 @@ app.get('/usuario', function(req, res) {
                     cuantos: conteo
                 });
             });
+            */
 
 
         });
 
 });
-app.post('/usuario', function(req, res) {
+app.post('/usuario', [verificaToken, verificaAdminRole], (req, res) => {
     //res.send('hello world');
     let body = req.body;
 
@@ -68,7 +80,7 @@ app.post('/usuario', function(req, res) {
 
     });
 });
-app.put('/usuario/:id', function(req, res) {
+app.put('/usuario/:id', [verificaToken, verificaAdminRole], (req, res) => {
     //res.send('hello world');
     let id = req.params.id;
     //let body = req.body;
@@ -93,7 +105,7 @@ app.put('/usuario/:id', function(req, res) {
     });
     */
 });
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', [verificaToken, verificaAdminRole], (req, res) => {
 
     const id = req.params.id;
 

@@ -12,14 +12,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-/*
-app.use('./routes/usuario.js', function(err, req, res, next) {
-    console.log(err);
-});
-*/
-
-var rutas_usuario = require('./routes/usuario');
-app.use('/', rutas_usuario);
+//Configuración global de rutas
+app.use('/', require('./routes/index'));
 
 const port = process.env.PORT;
 const urldb = process.env.URLDB;
